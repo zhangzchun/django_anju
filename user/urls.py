@@ -18,5 +18,5 @@ from . import views
 
 app_name='user'
 urlpatterns = [
-    # path('admin/', views.),
+    path('unloadImg/',views.unloadImg,name='unloadImg')
 ]

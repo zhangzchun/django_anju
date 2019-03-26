@@ -18,6 +18,7 @@ from django.urls import path, re_path,include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('qiniuToken/',views.qiniuToken,name='qiniuToken'),
     path('case/', include('case.urls')),
     path('collect/', include('collect.urls')),
     path('comment/', include('comment.urls')),

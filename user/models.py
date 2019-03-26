@@ -8,7 +8,6 @@ class userInfo(models.Model):
     nickname = models.CharField(max_length=30)
     sex = models.ForeignKey(to="sex", to_field="id", default=1, null=True, on_delete=models.CASCADE)
     password = models.CharField(max_length=255)
-    userIcon = models.ForeignKey(to="userIcon", to_field="id", default=1, null=True, on_delete=models.CASCADE)
     QQ = models.CharField(max_length=30, null=True, )
     address = models.CharField(max_length=30, null=True, )
     regist_data = models.DateTimeField(auto_now_add=True,max_length=0)
@@ -18,6 +17,7 @@ class userIcon(models.Model):
     # 自动创建一个id列，id为主键、自增长
     icon = models.CharField(max_length=255)
     upload_date = models.DateTimeField(auto_now_add=True,max_length=0)
+    user = models.ForeignKey(to="userInfo", to_field="id",null=True, on_delete=models.CASCADE)
 
 
 class sex(models.Model):
