@@ -22,6 +22,9 @@
 
             {"status_code":"10020","status_text":"预约成功"},
             {"status_code":"10021","status_text":"预约失败"},
+            {"status_code":"10022","status_text":"已经预约过了"},
+            {"status_code":"10023","status_text":"取消预约成功"},
+            {"status_code":"10024","status_text":"取消预约失败"},
 
             {"status_code":"10030","status_text":"收藏成功"},
             {"status_code":"10031","status_text":"收藏失败"},

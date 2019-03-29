@@ -8,6 +8,6 @@ class designerInfo(models.Model):
     name = models.CharField(max_length=30)
     case_num = models.IntegerField()
     personal_profile = models.CharField(max_length=255)
-    design_concept = models.CharField(max_length=30)
-    grade = models.CharField(max_length=255)
+    design_concept = models.CharField(max_length=250)
+    grade = models.CharField(max_length=30)
     company = models.ForeignKey(to=companyInfo, to_field="id", on_delete=models.CASCADE)

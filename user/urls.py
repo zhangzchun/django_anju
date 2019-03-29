@@ -18,5 +18,8 @@ from . import views
 
 app_name='user'
 urlpatterns = [
+    path('addAppointment/',views.addAppointment,name='addAppointment'),
+    path('getAppointment/',views.getAppointment,name='getAppointment'),
+    path('cancelAppointment/',views.cancelAppointment,name='cancelAppointment'),
     path('unloadImg/',views.unloadImg,name='unloadImg')
 ]

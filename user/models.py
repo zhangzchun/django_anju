@@ -46,6 +46,6 @@ class houseType(models.Model):
 class appointment(models.Model):
     # 自动创建一个id列，id为主键、自增长
     house = models.ForeignKey(to="houseInfo", to_field="id", on_delete=models.CASCADE)
-    company = models.ForeignKey(to=companyInfo, to_field="id", on_delete=models.CASCADE)
+    company = models.ForeignKey(to=companyInfo, to_field="id",unique=True, on_delete=models.CASCADE)
     appointment_status = models.CharField(max_length=30, default="正在预约")
     user = models.ForeignKey(to="userInfo", to_field="id", on_delete=models.CASCADE)

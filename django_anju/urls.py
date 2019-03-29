@@ -15,10 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path,include
+from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('qiniuToken/',views.qiniuToken,name='qiniuToken'),
+    path('sendMessage/',views.sendMessage,name='sendMessage'),
     path('case/', include('case.urls')),
     path('collect/', include('collect.urls')),
     path('comment/', include('comment.urls')),

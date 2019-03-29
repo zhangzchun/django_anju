@@ -28,21 +28,23 @@ def strategyList(request):
 def strategyDetail(request):
     if request.method == "GET":
         strategy_id = request.GET.get("strategy_id")
-        try:
-            strategy_content = models.strategyInfo.objects.filter(id=strategy_id).values("id", "strategy_title",
-                                                                                         "author", "publish_date",
-                                                                                         "strategycontent__lead",
-                                                                                         "strategycontent__strategy_content")
-            # strategy_content = [{'id': _.id, 'strategy_title':_.strategy_title,'author':_.author, 'nick': _.coreuserwxprofile__nickname} for _ in strategy_content]
-            res = list(strategy_content)
-            if res:
-                publish_date = str(res[0]["publish_date"]).replace("-", "/").split("+")[0]
-                res[0]["publish_date"] = publish_date
-                return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
-            else:
-                return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
-        except Exception as ex:
-            return ex
+        if strategy_id:
+            try:
+                strategy_content = models.strategyInfo.objects.filter(id=strategy_id).values("id", "strategy_title",
+                                                                                             "author", "publish_date",
+                                                                                             "strategycontent__lead",
+                                                                                             "strategycontent__strategy_content")
+                res = list(strategy_content)
+                if res:
+                    publish_date = str(res[0]["publish_date"]).replace("-", "/").split("+")[0]
+                    res[0]["publish_date"] = publish_date
+                    return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
+                else:
+                    return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
+            except Exception as ex:
+                return ex
+        else:
+            return JsonResponse({"status_code":"40005","status_text":"数据格式不合法"}, safe=False)
     else:
         return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
 
