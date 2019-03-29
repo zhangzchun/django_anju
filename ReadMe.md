@@ -40,10 +40,3 @@
             {"status_code":"40005","status_text":"数据格式不合法"},
             {"status_code":"40006","status_text":"请求方式错误"}
         ]
-
-2.命名规范:
-
-        命名:
-            路由名---全小写--login,regist
-            service层文件---add_User,
-            dao层文件---addUser,

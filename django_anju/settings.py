@@ -90,7 +90,7 @@ CORS_ALLOW_HEADERS = (
     'token',
     'cookie'
 )
-CORS_ALLOW_CREDENTIALS=True
+CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = 'django_anju.urls'
 
@@ -121,9 +121,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'renovation_django',
         'USER': 'root',
-        'PASSWORD': 'admin',
-        # 'PASSWORD'='123456',
-        # 'PASSWORD'='asd147.',
+        # 'PASSWORD': 'admin',
+        # 'PASSWORD':'123456',
+        'PASSWORD':'asd147.',
         'HOST': '127.0.0.1',
         'PORT': '3306',
     }

@@ -16,10 +16,14 @@ Including another URLconf
 from django.urls import path
 from . import views
 
-app_name='user'
+app_name = 'user'
 urlpatterns = [
-    path('addAppointment/',views.addAppointment,name='addAppointment'),
-    path('getAppointment/',views.getAppointment,name='getAppointment'),
-    path('cancelAppointment/',views.cancelAppointment,name='cancelAppointment'),
-    path('unloadImg/',views.unloadImg,name='unloadImg')
+    path('login/', views.login, name='login'),
+    path('regist/', views.regist, name='regist'),
+    path('houseList/', views.houseList, name='houseList'),
+
+    path('addAppointment/', views.addAppointment, name='addAppointment'),
+    path('getAppointment/', views.getAppointment, name='getAppointment'),
+    path('cancelAppointment/', views.cancelAppointment, name='cancelAppointment'),
+    path('unloadImg/', views.unloadImg, name='unloadImg')
 ]

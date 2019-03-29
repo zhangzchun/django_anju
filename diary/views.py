@@ -162,6 +162,15 @@ def diaryTitle(request):
 def writeDiary(request):
     pass
 
+# 上传日记
+def addDiaryCentent(request):
+    pass
+
+
+# 上传日记图片
+def addDiaryImg(request):
+    pass
+
 
 # 返回字典对象
 def dictfetchall(cursor):
