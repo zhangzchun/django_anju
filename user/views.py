@@ -110,12 +110,63 @@ def login(request):
 
 # 获取用户信息
 def getUserInfo(request):
-    pass
+    if request.method == "GET":
+        user_id = request.GET.get("user_id")
+        if user_id:
+            try:
+                cursor = connection.cursor()
+                sql = "select `user`.nickname,`user`.id,`user`.telephone,icon.icon,sex.gender as sex,`user`.QQ,`user`.address\
+                        from user_userinfo as `user` INNER JOIN user_usericon as icon INNER JOIN user_sex as sex\
+                        on `user`.userIcon_id=icon.id  and `user`.sex_id=sex.id\
+                        WHERE `user`.id={user_id}".format(user_id=user_id)
+                cursor.execute(sql)
+                res = dictfetchall(cursor)
+                if res:
+                    return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
+                else:
+                    return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
+            except Exception as ex:
+                return ex
+        else:
+            return JsonResponse({"status_code": "40005", "status_text": "数据格式不合法"}, safe=False)
+    else:
+        return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
 
 
 # 修改用户信息
 def changeUserInfo(request):
-    pass
+    if request.method == 'POST':
+    # # 请求方式为--POST
+        try:
+            # 取前端数据
+            # body = request.body
+            # user = body and json.loads(body)
+            user_info=json.loads(request.body)
+            print(user_info)
+            if user_info:
+                sex=list(models.sex.objects.filter(gender=user_info["sex"]).values("id"))
+                del user_info["sex"]
+
+                user_info["six_id"]=sex[0]["id"]
+                print(user_info)
+                # row=models.userInfo.objects.filter(id=user_info["id"]).update(nickname=user_info["nickname"],
+                # QQ=user_info["QQ"],six_id=user_info["six_id"],address=user_info["address"])
+                # house_status=userInfo["house_status"],houseType_id=userInfo["houseType_id"])
+
+                user=models.userInfo.objects.create(**user_info)
+                user.save()
+                print(user)
+                if user:
+                    return JsonResponse({"status_code": "10014", "status_text": "更新信息成功"}, safe=False)
+                else:
+                    return JsonResponse({"status_code": "10015", "status_text": "更新信息失败"}, safe=False)
+        except Exception as ex:
+            return ex
+        # 系统错误
+        return JsonResponse({"status_code": "40004", "status_text": "系统错误"})
+    else:
+        return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
+
 
 
 # 上传头像
@@ -207,31 +258,18 @@ def cancelAppointment(request):
 
 # 获取验证码
 def getIdentifyingCode(request):
-    pass
-
-
-# 修改密码接口
-def updatePassword(request):
-    pass
-
-
-# 获取房屋信息接口
-def houseList(request):
-    if request.method == 'POST':
-        # 请求方式为--POST
-        try:
-            # 取前端数据
-            body = request.body
-            user = body and json.loads(body)
-
-            if user.get('user_id'):
-                pass
-
-
-
-
-        except Exception as ex:
-            print(ex)
+    if request.method == 'GET':
+        id = random.choice(range(1, 3))
+        if id:
+            try:
+                res=list(models.identifyingCode.objects.filter(id=id).values())
+                if res:
+                    print(res)
+                    return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
+                else:
+                    return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
+            except Exception as ex:
+                return ex
             # 系统错误
             return JsonResponse({"status_code": "40004", "status_text": "系统错误"})
 
@@ -239,26 +277,154 @@ def houseList(request):
         return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
 
 
+# 修改密码接口
+def updatePassword(request):
+    if request.method == 'POST':
+    # # 请求方式为--POST
+        try:
+            # 取前端数据
+            # body = request.body
+            # user = body and json.loads(body)
+            passWord=json.loads(request.body)
+            print(passWord)
+            if passWord:
+                oldPwd=list(models.userInfo.objects.filter(id=passWord["id"]).values("password"))
+                print(oldPwd)
+                if (check_password_hash(oldPwd[0]['password'], passWord['old_pwd'])):
+                    pf = generate_password_hash(passWord['new_pwd'], method='pbkdf2:sha1:1001', salt_length=8)
+                    passWord['new_pwd'] = pf
+                    row=models.userInfo.objects.filter(id=passWord["id"]).update(password=passWord['new_pwd'])
+                    if row:
+                        return JsonResponse({"status_code": "10014", "status_text": "更新信息成功"})
+                    else:
+                        return JsonResponse({"status_code": "10015", "status_text": "更新信息失败"})
+
+                else:
+                    return JsonResponse({"status_code": "10005", "status_text": "密码错误"})
+
+        except Exception as ex:
+            return ex
+        # 系统错误
+        return JsonResponse({"status_code": "40004", "status_text": "系统错误"})
+    else:
+        return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
+
+
+# 获取房屋信息接口
+def getHouseList(request):
+    if request.method == 'GET':
+        user_id = request.GET.get("user_id")
+        if user_id:
+            try:
+                cursor = connection.cursor()
+                sql = "SELECT house.id, house.`name`, type.`name` as type,\
+                      house.area,house.house_status ,house.address, house.village \
+                      FROM user_houseinfo as house INNER JOIN user_housetype as type ON house.houseType_id=type.id \
+                      where user_id={user_id}".format(user_id=user_id)
+                cursor.execute(sql)
+                res = dictfetchall(cursor)
+                if res:
+                    for r in res:
+                        r["flag"]=False
+                    return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
+                else:
+                    return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
+            except Exception as ex:
+                return ex
+            # 系统错误
+            return JsonResponse({"status_code": "40004", "status_text": "系统错误"})
+
+    else:
+        return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
+
+
+# 更新房屋信息
+def updateHouseInfo(request):
+    if request.method == 'POST':
+    # # 请求方式为--POST
+        try:
+            # 取前端数据
+            # body = request.body
+            # user = body and json.loads(body)
+            houseInfo=json.loads(request.body)
+            print(houseInfo)
+            if houseInfo:
+                del houseInfo["flag"]
+                houseType=list(models.houseType.objects.filter(name=houseInfo["type"]).values("id"))
+                del houseInfo["type"]
+                houseInfo["houseType_id"]=houseType[0]["id"]
+                row=models.houseInfo.objects.filter(id=houseInfo["id"]).update(name=houseInfo["name"],
+                area=houseInfo["area"],village=houseInfo["village"],address=houseInfo["address"],
+                house_status=houseInfo["house_status"],houseType_id=houseInfo["houseType_id"])
+
+                # house=models.houseInfo.objects.filter(id=houseInfo["id"])
+                # house.update()
+                print(row)
+                if row:
+                    return JsonResponse({"status_code": "10014", "status_text": "更新信息成功"}, safe=False)
+                else:
+                    return JsonResponse({"status_code": "10015", "status_text": "更新信息失败"}, safe=False)
+        except Exception as ex:
+            return ex
+        # 系统错误
+        return JsonResponse({"status_code": "40004", "status_text": "系统错误"})
+    else:
+        return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
+
 # 新增房屋信息
 def addHouseInfo(request):
-    pass
+    if request.method == 'POST':
+    # # 请求方式为--POST
+        try:
+            houseInfo=json.loads(request.body)
+            print(houseInfo)
+            if houseInfo:
+                del houseInfo["flag"]
+                houseType=list(models.houseType.objects.filter(name=houseInfo["type"]).values("id"))
+                del houseInfo["type"]
+                houseInfo["houseType_id"]=houseType[0]["id"]
+                print(houseInfo)
+                house=models.houseInfo.objects.create(**houseInfo)
+                house.save()
+                if house.id:
+                    return JsonResponse({"status_code": "10012", "status_text": "添加信息成功"}, safe=False)
+                else:
+                    return JsonResponse({"status_code": "10013", "status_text": "添加信息失败"}, safe=False)
+        except Exception as ex:
+            return ex
+        # 系统错误
+        return JsonResponse({"status_code": "40004", "status_text": "系统错误"})
+    else:
+        return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
+
+# 删除房屋信息
+def delHouseInfo(request):
+    if request.method == 'POST':
+    # # 请求方式为--POST
+        try:
+            house_id=json.loads(request.body)
+            print(house_id["id"])
+            if house_id["id"]:
+
+                row=models.houseInfo.objects.filter(id=house_id["id"]).delete()
+                print(row)
+                if row:
+                    return JsonResponse({"status_code": "10016", "status_text": "删除信息成功"}, safe=False)
+                else:
+                    return JsonResponse({"status_code": "10017", "status_text": "删除信息失败"}, safe=False)
+        except Exception as ex:
+            return ex
+        # 系统错误
+        return JsonResponse({"status_code": "40004", "status_text": "系统错误"})
+    else:
+        return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
 
 
-# 修改房屋信息
-def updateHouseInfo(request):
-    pass
 
 
 
 
-# 取消预约接口
-def subAppointment(request):
-    pass
 
-
-# 修改房屋状态接口
-def updateHouse(request):
-    pass
 
 
 # 返回字典对象

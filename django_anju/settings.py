@@ -122,8 +122,8 @@ DATABASES = {
         'NAME': 'renovation_django',
         'USER': 'root',
         # 'PASSWORD': 'admin',
-        # 'PASSWORD':'123456',
-        'PASSWORD':'asd147.',
+        'PASSWORD':'123456',
+        # 'PASSWORD':'asd147.',
         'HOST': '127.0.0.1',
         'PORT': '3306',
     }

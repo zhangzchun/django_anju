@@ -20,7 +20,15 @@ app_name = 'user'
 urlpatterns = [
     path('login/', views.login, name='login'),
     path('regist/', views.regist, name='regist'),
-    path('houseList/', views.houseList, name='houseList'),
+
+    path('changeUserInfo/', views.changeUserInfo, name='changeUserInfo'),
+    path('getIdentifyingCode/', views.getIdentifyingCode, name='getIdentifyingCode'),
+    path('updatePassword/', views.updatePassword, name='updatePassword'),
+    path('getUserInfo/', views.getUserInfo, name='getUserInfo'),
+    path('getHouseList/', views.getHouseList, name='getHouseList'),
+    path('addHouseInfo/', views.addHouseInfo, name='addHouseInfo'),
+    path('updateHouseInfo/', views.updateHouseInfo, name='updateHouseInfo'),
+    path('delHouseInfo/', views.delHouseInfo, name='delHouseInfo'),
 
     path('addAppointment/', views.addAppointment, name='addAppointment'),
     path('getAppointment/', views.getAppointment, name='getAppointment'),

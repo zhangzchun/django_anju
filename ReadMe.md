@@ -20,6 +20,12 @@
             {"status_code":"10012","status_text":"添加信息成功"},
             {"status_code":"10013","status_text":"添加信息失败"},
 
+            {"status_code":"10014","status_text":"更新信息成功"},
+            {"status_code":"10015","status_text":"更新信息失败"},
+
+            {"status_code":"10016","status_text":"删除信息成功"},
+            {"status_code":"10017","status_text":"删除信息失败"},
+
             {"status_code":"10020","status_text":"预约成功"},
             {"status_code":"10021","status_text":"预约失败"},
             {"status_code":"10022","status_text":"已经预约过了"},

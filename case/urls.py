@@ -14,9 +14,17 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
+from django.conf.urls import url, include
 from . import views
 
 app_name='case'
 urlpatterns = [
     # path('admin/', views.),
+    url(r'getCaseNum/',views.getCaseNum,name='getCaseNum'),
+    url(r'getCase/',views.getCase,name='getCase'),
+    url(r'getConditionCase/',views.getConditionCase,name='getConditionCase'),
+    url(r'getConditionCaseNum/',views.getConditionCaseNum,name='getConditionCaseNum'),
+    url(r'getCompanyCase/',views.getCompanyCase,name='getCompanyCase'),
+    url(r'getCaseDetail/',views.getCaseDetail,name='getCaseDetail'),
+    url(r'getCaseDetailImg/',views.getCaseDetailImg,name='getCaseDetailImg'),
 ]

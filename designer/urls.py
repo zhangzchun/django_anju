@@ -15,8 +15,14 @@ Including another URLconf
 """
 from django.urls import path,re_path
 from . import views
+from django.conf.urls import url, include
+
 
 app_name='designer'
 urlpatterns = [
-    re_path(r'^designerList\w*/',views.designerList,name='designerList')
+    re_path(r'^designerComList\w*/',views.designerComList,name='designerComList'),
+
+
+    url(r'designerListNum/',views.designerListNum,name='designerListNum'),
+    url(r'designerPage/',views.designerPage,name='designerPage'),
 ]

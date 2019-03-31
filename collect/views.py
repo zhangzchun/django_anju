@@ -70,7 +70,7 @@ def diaryCollections(request):
         if user_id:
             try:
                 cursor = connection.cursor()
-                sql = "SELECT d.id diary_id ,u.nickname,ui.icon , d.diary_title , s.`name` style_name ,d.company\
+                sql = "SELECT c.id, d.id diary_id ,u.nickname,ui.icon , d.diary_title , s.`name` style_name ,d.company\
                  ,c.collect_date ,dc.diary_content,(SELECT group_concat(di.diary_img) FROM diary_diaryimg di WHERE\
                   di.diaryContent_id = dc.id && dc.diary_id=d.id) diary_img FROM collect_collectinfo c INNER JOIN\
                    user_userinfo u INNER JOIN user_usericon ui INNER JOIN diary_diaryinfo d INNER JOIN \
@@ -83,6 +83,9 @@ def diaryCollections(request):
                     for i in range(len(res)):
                         diary_img = res[i]["diary_img"].split(",")
                         res[i]["diary_img"] = diary_img
+                    for r in res:
+                        r["check"] = False
+                        r["checkNum"] = 1
                     return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
                 else:
                     return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
@@ -101,7 +104,7 @@ def strategyCollections(request):
         if user_id:
             try:
                 cursor = connection.cursor()
-                sql = "select s.id , si.strategy_img,s.strategy_title, sc.lead, c.collect_date \
+                sql = "select c.id, s.id , si.strategy_img,s.strategy_title, sc.lead, c.collect_date \
                         from collect_collectinfo c INNER JOIN collect_collecttype ct INNER JOIN user_userinfo u \
                         INNER JOIN strategy_strategyinfo s INNER JOIN strategy_strategycontent sc INNER JOIN strategy_strategyimg si\
                         on c.collectType_id = ct.id and c.user_id =u.id and c.content_id=s.id and s.id=sc.strategy_id \
@@ -109,6 +112,9 @@ def strategyCollections(request):
                 cursor.execute(sql)
                 res = dictfetchall(cursor)
                 if res:
+                    for r in res:
+                        r["check"] = False
+                        r["checkNum"] = 1
                     return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
                 else:
                     return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
@@ -126,11 +132,13 @@ def companyCollections(request):
         user_id = request.GET.get("user_id")
         if user_id:
             try:
-                res=list(models.collectInfo.objects.filter(user_id=user_id,collectType_id=3).values("content_id","collect_date"))
+                res=list(models.collectInfo.objects.filter(user_id=user_id,collectType_id=3).values("id","content_id","collect_date"))
                 if res:
                     for r in res:
                         com_info=list(com_models.companyInfo.objects.filter(id=r["content_id"]).values("company_icon","name","case_num","work_site_num","contact_tel"))
                         r.update(com_info[0])
+                        r["check"] = False
+                        r["checkNum"] = 1
                     return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
                 else:
                     return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
@@ -148,7 +156,7 @@ def caseCollections(request):
         if user_id:
             try:
                 cursor = connection.cursor()
-                sql = "select case_caseinfo.id ,ci.img_url,case_caseinfo.`name`, case_caseinfo.area, s.`name` style_name, \
+                sql = "select c.id, case_caseinfo.id ,ci.img_url,case_caseinfo.`name`, case_caseinfo.area, s.`name` style_name, \
                         ht.`name` houseType, rt.`name` renovation_type, case_caseinfo.cost, c.collect_date \
                         from collect_collectinfo c INNER JOIN case_caseinfo INNER JOIN case_caseimg ci \
                         INNER JOIN search_style s INNER JOIN user_housetype ht INNER JOIN search_renovationtype rt\
@@ -158,6 +166,9 @@ def caseCollections(request):
                 cursor.execute(sql)
                 res = dictfetchall(cursor)
                 if res:
+                    for r in res:
+                        r["check"] = False
+                        r["checkNum"] = 1
                     return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
                 else:
                     return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
