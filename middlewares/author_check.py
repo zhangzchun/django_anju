@@ -17,7 +17,9 @@ class RequestAuth(MiddlewareMixin):
                      '/collect/checkCollection/',
                      '/comment/addComment/',
                      '/comment/addReply/',
-                     '/user/addAppointment/']
+                     '/user/addAppointment/'
+
+                     ]
 
         if url in url_check:
             res = checkToken(request.headers.get('token'))

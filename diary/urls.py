@@ -16,13 +16,17 @@ Including another URLconf
 from django.urls import path, re_path
 from . import views
 
-app_name='diary'
+app_name = 'diary'
 urlpatterns = [
-    re_path(r'^diaryList\w*/',views.diaryList,name="diaryList"),
-    re_path(r'^diaryDetailHeader\w*/',views.diaryDetailHeader,name="diaryDetailHeader"),
-    re_path(r'^diaryDetailContent\w*/',views.diaryDetailContent,name="diaryDetailContent"),
-    re_path(r'^diaryUserIcon\w*/',views.diaryUserIcon,name="diaryUserIcon"),
-    re_path(r'^indexDiary\w*/',views.indexDiary,name="indexDiary"),
-    re_path(r'^diaryTitle\w*/',views.diaryTitle,name="diaryTitle"),
-    re_path(r'^writeDiary\w*/',views.writeDiary,name="writeDiary"),
+    re_path(r'^diaryList\w*/', views.diaryList, name="diaryList"),
+    re_path(r'^diaryDetailHeader\w*/', views.diaryDetailHeader, name="diaryDetailHeader"),
+    re_path(r'^diaryDetailContent\w*/', views.diaryDetailContent, name="diaryDetailContent"),
+    re_path(r'^diaryUserIcon\w*/', views.diaryUserIcon, name="diaryUserIcon"),
+    re_path(r'^indexDiary\w*/', views.indexDiary, name="indexDiary"),
+    re_path(r'^diaryTitle\w*/', views.diaryTitle, name="diaryTitle"),
+
+    re_path(r'^getUserDiary\w*/', views.getUserDiary, name="getUserDiary"),
+    re_path(r'^addUserDiary\w*/', views.addDiary, name="addDiary"),
+
+    re_path(r'^writeDiary\w*/', views.writeDiary, name="writeDiary"),
 ]

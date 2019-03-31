@@ -3,6 +3,8 @@ from django.http import JsonResponse
 import json
 from . import models
 from django.db import connection, connections
+import random
+
 # 导入加密模块
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -270,8 +272,6 @@ def getIdentifyingCode(request):
                     return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
             except Exception as ex:
                 return ex
-            # 系统错误
-            return JsonResponse({"status_code": "40004", "status_text": "系统错误"})
 
     else:
         return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
@@ -313,29 +313,64 @@ def updatePassword(request):
 # 获取房屋信息接口
 def getHouseList(request):
     if request.method == 'GET':
+        # 请求方式为--GET
+        # 取前端数据
         user_id = request.GET.get("user_id")
-        if user_id:
+        house_id= request.GET.get("house_id")
+        # user["house_id"]:
+        if house_id:
+            # house_id
             try:
-                cursor = connection.cursor()
-                sql = "SELECT house.id, house.`name`, type.`name` as type,\
-                      house.area,house.house_status ,house.address, house.village \
-                      FROM user_houseinfo as house INNER JOIN user_housetype as type ON house.houseType_id=type.id \
-                      where user_id={user_id}".format(user_id=user_id)
-                cursor.execute(sql)
-                res = dictfetchall(cursor)
-                if res:
-                    for r in res:
-                        r["flag"]=False
-                    return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
+                res = models.houseInfo.objects.filter(id=house_id).values("id",
+                                                                           "name",
+                                                                           "houseType__name",
+                                                                           "area",
+                                                                           "house_status",
+                                                                           "address",
+                                                                           "village"
+                                                                            )
+                houseinfo = list(res)
+                if houseinfo:
+                    return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": houseinfo},
+                                        safe=False)
                 else:
                     return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
             except Exception as ex:
-                return ex
-            # 系统错误
-            return JsonResponse({"status_code": "40004", "status_text": "系统错误"})
+                print(ex)
+                # 系统错误
+                return JsonResponse({"status_code": "40004", "status_text": "系统错误"})
+
+        elif user_id:
+            # print("这里")
+            try:
+                res = models.houseInfo.objects.filter(user_id=user_id).values("id",
+                                                                               "name",
+                                                                               "houseType__name",
+                                                                               "area",
+                                                                               "house_status",
+                                                                               "address",
+                                                                                "village"
+                                                                                )
+
+                houselist = list(res)
+                if houselist:
+                    return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": houselist},
+                                        safe=False)
+                else:
+                    return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
+            except Exception as ex:
+                print(ex)
+                # 系统错误
+                return JsonResponse({"status_code": "40004", "status_text": "系统错误"}, safe=False)
+
+        else:
+            # 信息错误
+            return JsonResponse({"status_code": "40005", "status_text": "数据格式不合法"}, safe=False)
 
     else:
+        # 请求方式错误
         return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
+
 
 
 # 更新房屋信息

@@ -16,12 +16,12 @@ Including another URLconf
 from . import views
 from django.urls import path, re_path
 
-app_name='commpany'
+app_name = 'commpany'
 urlpatterns = [
     # re_path(r'^companyList\w*/',views.companyList,name="companyList"),
-    re_path(r'^indexCompanyList\w*/',views.indexCompanyList,name="indexCompanyList"),
-    re_path(r'^companyDetail\w*/',views.companyDetail,name="companyDetail"),
-    re_path(r'^companySort\w*/',views.companySort,name="companySort"),
+    re_path(r'^indexCompanyList\w*/', views.indexCompanyList, name="indexCompanyList"),
+    re_path(r'^companyDetail\w*/', views.companyDetail, name="companyDetail"),
+    re_path(r'^companySort\w*/', views.companySort, name="companySort"),
     # re_path(r'^companyScreen\w*/',views.companyScreen,name="companyScreen")
 
     re_path(r'^companyList\w*/', views.companyList, name="companyList"),

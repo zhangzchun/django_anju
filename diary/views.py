@@ -94,12 +94,14 @@ def diaryDetailContent(request):
 def diaryUserIcon(request):
     if request.method == "GET":
         try:
-            dairy_content = models.diaryInfo.objects.all().values("id","user_id").order_by("id")[0:12]
+            dairy_content = models.diaryInfo.objects.all().values("id", "user_id").order_by("id")[0:12]
             res = list(dairy_content)
             if res:
                 for r in res:
-                    user_icon=list(umodels.userIcon.objects.filter(user_id=r["user_id"]).values("icon").order_by("-upload_date")[0:1])
-                    r["user_icon"]=user_icon[0]["icon"]
+                    user_icon = list(
+                        umodels.userIcon.objects.filter(user_id=r["user_id"]).values("icon").order_by("-upload_date")[
+                        0:1])
+                    r["user_icon"] = user_icon[0]["icon"]
                 return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
             else:
                 return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
@@ -158,18 +160,94 @@ def diaryTitle(request):
         return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
 
 
-# 写日记
+# 获取用户日记
+def getUserDiary(request):
+    if request.method == "GET":
+        user_id = request.GET.get("user_id")
+
+        if user_id:
+            try:
+                cursor = connection.cursor()
+                sql = "select d.id,d.diary_title,d.publish_date,d.area,s.`name` as style, \
+                        rt.`name` as reno_type,d.village,d.company,count(d.id) as count\
+                        from diary_diaryinfo as d inner join search_style as s inner join search_renovationtype as rt \
+                        inner join diary_diarycontent as dc on d.style_id = s.id \
+                        and d.renovationType_id = rt.id and d.id = dc.diary_id \
+                        where user_id = {id} group by d.id ".format(id=user_id)
+
+                cursor.execute(sql)
+                print('here')
+                res = dictfetchall(cursor)
+
+                for i in range(len(res)):
+                    public_date = str(res[i]["publish_date"]).replace("-", "/")
+                    res[i]["publish_date"] = public_date
+
+                return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
+
+            except Exception as ex:
+                print('获取用户日记=>系统错误==>')
+                print(ex)
+                # 系统错误
+                return JsonResponse({"status_code": "40004", "status_text": "系统错误"}, safe=False)
+        else:
+            # 信息错误
+            # print("获取用户日记=>信息错误==>")
+            return JsonResponse({"status_code": "40005", "status_text": "数据格式不合法"}, safe=False)
+
+    else:
+        # 请求方式错误
+        return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
+
+
+# 添加用户日记
+def addDiary(request):
+    if request.method == "POST":
+        body = request.body
+        diary = body and json.loads(body)
+
+        if diary:
+            try:
+                res = models.diaryInfo.objects.create(**diary)
+                res.save()
+                diary_id = res.id
+                if diary_id:
+                    return JsonResponse({"status_code": "10012", "status_text": "添加信息成功", "content": diary_id},
+                                      safe=False)
+                else:
+                    return JsonResponse({"status_code": "10013", "status_text": "添加信息失败"}, safe=False)
+
+            except Exception as ex:
+                print('添加用户日记=>系统错误==>')
+                print(ex)
+                # 系统错误
+                return JsonResponse({"status_code": "40004", "status_text": "系统错误"}, safe=False)
+        else:
+            # 信息错误
+            # print("添加用户日记=>信息错误==>")
+            return JsonResponse({"status_code": "40005", "status_text": "数据格式不合法"}, safe=False)
+
+    else:
+        # 请求方式错误
+        return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
+
+
+# 编辑日记
+def updaeDiary(request):
+    if request.method == "POST":
+        pass
+    else:
+        # 请求方式错误
+        return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
+
+
+# 写日记内容
 def writeDiary(request):
     pass
 
-# 上传日记
-def addDiaryCentent(request):
-    pass
 
 
-# 上传日记图片
-def addDiaryImg(request):
-    pass
+
 
 
 # 返回字典对象
