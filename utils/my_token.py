@@ -13,7 +13,7 @@ def createToken(user_id):
     import datetime
     import hashlib
     # 当前时间加上180秒，意味着token过期时间为3分钟以后
-    datetimeInt = datetime.datetime.utcnow() + datetime.timedelta(seconds=60*6)
+    datetimeInt = datetime.datetime.utcnow() + datetime.timedelta(seconds=60*30)
     option = {
         'iss': 'jobapp.com',  # token的签发者
         'exp': datetimeInt,  # 过期时间

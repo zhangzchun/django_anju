@@ -22,7 +22,7 @@ def getComments(request):
                         commentType_id = 2
                     comment_info = models.commentInfo.objects.filter(comment_obj_id=id[i],
                                                                      commentType_id=commentType_id).values(
-                        "id", "fromu_id", "fromu_id", "fromu__nickname", "comment_content", "comment_time",
+                        "id", "fromu_id", "fromu__nickname", "comment_content", "comment_time",
                         "comment_num").order_by("-comment_time", "-comment_num")
 
                     res = list(comment_info)
@@ -83,13 +83,15 @@ def addComment(request):
                 if comment.id:
                     comment_info = models.commentInfo.objects.filter(comment_obj_id=data["comment_obj_id"],
                                                                      commentType_id=data["commentType_id"]).values(
-                        "id", "fromu_id", "fromu__userIcon__icon", "fromu__nickname", "comment_content", "comment_time",
+                        "id", "fromu_id", "fromu__nickname", "comment_content", "comment_time",
                         "comment_num").order_by("-comment_time", "-comment_num")
                     res = list(comment_info)
                     if res:
                         for i in range(len(res)):
                             comment_time = str(res[i]["comment_time"]).replace("-", "/").split("+")[0]
                             res[i]["comment_time"] = comment_time
+                            user_icon = list(umodels.userIcon.objects.filter(user_id=res[i]["fromu_id"]).values("icon").order_by("-upload_date")[0:1])
+                            res[i]["user_icon"] = user_icon[0]["icon"]
                         return JsonResponse({"status_code": "10010", "status_text": "评论成功", "content": res}, safe=False)
                 return JsonResponse({"status_code": "10011", "status_text": "评论失败"}, safe=False)
             except Exception as ex:
@@ -114,13 +116,15 @@ def addReply(request):
                     comment_num = list(models.commentInfo.objects.filter(id=data["comment_id"]).values("comment_num"))
                     if affect_rows and comment_num:
                         reply_info = models.replyInfo.objects.filter(comment_id=data["comment_id"]).values(
-                            "id", "fromu_id", "comment_id", "fromu__userIcon__icon", "fromu__nickname", "reply_content",
+                            "id", "fromu_id", "comment_id", "fromu__nickname", "reply_content",
                             "reply_time", "tou_nickname").order_by("-reply_time")
                         res = list(reply_info)
                         if res:
                             for i in range(len(res)):
                                 reply_time = str(res[i]["reply_time"]).replace("-", "/").split("+")[0]
                                 res[i]["reply_time"] = reply_time
+                                user_icon = list(umodels.userIcon.objects.filter(user_id=res[i]["fromu_id"]).values("icon").order_by("-upload_date")[0:1])
+                                res[i]["user_icon"] = user_icon[0]["icon"]
                             return JsonResponse(
                                 {"status_code": "10010", "status_text": "评论成功", "comment_num": comment_num,
                                  "content": res},
@@ -135,4 +139,5 @@ def addReply(request):
 
 
 if __name__ == '__main__':
-    data={'fromu_id': 1, 'comment_id': 74, 'reply_id': None, 'replyType_id': 1, 'reply_content': '测试一', 'tou_id': 1, 'tou_nickname': '瀚海百丈冰'}
+    data = {'fromu_id': 1, 'comment_id': 74, 'reply_id': None, 'replyType_id': 1, 'reply_content': '测试一', 'tou_id': 1,
+            'tou_nickname': '瀚海百丈冰'}

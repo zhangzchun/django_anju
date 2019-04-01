@@ -20,12 +20,6 @@
             {"status_code":"10012","status_text":"添加信息成功"},
             {"status_code":"10013","status_text":"添加信息失败"},
 
-            {"status_code":"10014","status_text":"更新信息成功"},
-            {"status_code":"10015","status_text":"更新信息失败"},
-
-            {"status_code":"10016","status_text":"删除信息成功"},
-            {"status_code":"10017","status_text":"删除信息失败"},
-
             {"status_code":"10020","status_text":"预约成功"},
             {"status_code":"10021","status_text":"预约失败"},
             {"status_code":"10022","status_text":"已经预约过了"},
@@ -46,3 +40,10 @@
             {"status_code":"40005","status_text":"数据格式不合法"},
             {"status_code":"40006","status_text":"请求方式错误"}
         ]
+
+2.命名规范:
+
+        命名:
+            路由名---全小写--login,regist
+            service层文件---add_User,
+            dao层文件---addUser,

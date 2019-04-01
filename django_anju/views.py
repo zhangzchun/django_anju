@@ -81,3 +81,6 @@ def sendMessage(request):
     print(eval(response_str.decode()))
     # 使用eval把字符串转为json数据返回
     return JsonResponse(eval(response_str.decode()))
+
+def checktoken(request):
+    return JsonResponse({"status_code":"200","status_text":"登录未过期"})

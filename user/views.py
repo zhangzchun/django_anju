@@ -119,8 +119,9 @@ def getUserInfo(request):
                 cursor = connection.cursor()
                 sql = "select `user`.nickname,`user`.id,`user`.telephone,icon.icon,sex.gender as sex,`user`.QQ,`user`.address\
                         from user_userinfo as `user` INNER JOIN user_usericon as icon INNER JOIN user_sex as sex\
-                        on `user`.userIcon_id=icon.id  and `user`.sex_id=sex.id\
-                        WHERE `user`.id={user_id}".format(user_id=user_id)
+                        on `user`.id=icon.user_id  and `user`.sex_id=sex.id\
+                        WHERE `user`.id={user_id} order by icon.upload_date desc".format(user_id=user_id)
+
                 cursor.execute(sql)
                 res = dictfetchall(cursor)
                 if res:
@@ -144,21 +145,36 @@ def changeUserInfo(request):
             # body = request.body
             # user = body and json.loads(body)
             user_info=json.loads(request.body)
-            print(user_info)
-            if user_info:
-                sex=list(models.sex.objects.filter(gender=user_info["sex"]).values("id"))
-                del user_info["sex"]
 
-                user_info["six_id"]=sex[0]["id"]
+            if user_info:
+                if (user_info["sex"]=="男"):
+                    user_info["sex_id"]=1
+                elif (user_info["sex"]=="女"):
+                    user_info["sex_id"] = 2
+
+                cursor = connection.cursor()
                 print(user_info)
-                # row=models.userInfo.objects.filter(id=user_info["id"]).update(nickname=user_info["nickname"],
+                sql = "update user_userinfo set nickname='{nickname}',sex_id={sex_id},QQ={QQ},address='{address}'\
+                        where id={user_id}".format(nickname=user_info["nickname"],sex_id=user_info["sex_id"],
+                        QQ=user_info["QQ"],address=user_info["address"],user_id=user_info["id"])
+                print(sql)
+                cursor.execute(sql)
+                res = cursor.fetchone
+
+
+
+
+
+                # user_info["six_id"]=sex[0]["id"]
+                # print(user_info)
+                # user=models.userInfo.objects.filter(id=user_info["id"]).update(nickname=user_info["nickname"],
                 # QQ=user_info["QQ"],six_id=user_info["six_id"],address=user_info["address"])
                 # house_status=userInfo["house_status"],houseType_id=userInfo["houseType_id"])
 
-                user=models.userInfo.objects.create(**user_info)
-                user.save()
-                print(user)
-                if user:
+                # user=models.userInfo.objects.create(**user_info)
+                # user.save()
+                print(res)
+                if res:
                     return JsonResponse({"status_code": "10014", "status_text": "更新信息成功"}, safe=False)
                 else:
                     return JsonResponse({"status_code": "10015", "status_text": "更新信息失败"}, safe=False)
@@ -220,8 +236,8 @@ def getAppointment(request):
         if user_id:
             try:
                 cursor = connection.cursor()
-                sql = "SELECT a.id, c.company_icon, c.`name` company_name, c.case_num, c.work_site_num, c.contact_tel, \
-                        hy.`name` house_type, h.area, h.address, h.village, a.appointment_status\
+                sql = "SELECT a.id, c.company_icon com_src, c.`name` com_name, c.case_num, c.work_site_num, c.contact_tel telephone, \
+                        hy.`name` house_type, h.area house_area, h.address house_address, h.village house_village, a.appointment_status\
                         from user_appointment a INNER JOIN company_companyinfo c INNER JOIN user_houseinfo h \
                         INNER JOIN user_housetype hy ON a.company_id=c.id and a.house_id=h.id and h.houseType_id=hy.id\
                         where a.user_id={user_id}".format(user_id=user_id)
@@ -261,7 +277,7 @@ def cancelAppointment(request):
 # 获取验证码
 def getIdentifyingCode(request):
     if request.method == 'GET':
-        id = random.choice(range(1, 3))
+        id = random.choice(range(1, 26))
         if id:
             try:
                 res=list(models.identifyingCode.objects.filter(id=id).values())
@@ -331,6 +347,8 @@ def getHouseList(request):
                                                                             )
                 houseinfo = list(res)
                 if houseinfo:
+                    for h in houseinfo:
+                        h["flag"]=False
                     return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": houseinfo},
                                         safe=False)
                 else:
@@ -462,6 +480,7 @@ def delHouseInfo(request):
 
 
 
+
 # 返回字典对象
 def dictfetchall(cursor):
     "将游标返回的结果保存到一个字典对象中"
@@ -470,3 +489,4 @@ def dictfetchall(cursor):
         dict(zip([col[0] for col in desc], row))
         for row in cursor.fetchall()
     ]
+

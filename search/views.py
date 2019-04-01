@@ -10,11 +10,15 @@ from strategy import models as strategyModels
 def searchCompany(request):
     if request.method=="GET":
         search_content = request.GET.get("search_content")
+        print(search_content)
         if search_content:
             try:
                 company_list=com_models.companyInfo.objects.filter(name__contains=search_content).values("id","name","contact_tel","case_num","work_site_num","company_icon","companyimg__name")
                 res=list(company_list)
+                print(res)
                 if res:
+                    for r in res:
+                        r["com_src"]=r["companyimg__name"]
                     return JsonResponse({"status_code": "10009", "status_text":"找到数据","content": res},safe=False)
                 else:
                     return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)

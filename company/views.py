@@ -3,41 +3,37 @@ from django.http import HttpResponse, response, JsonResponse
 from django.db import connection, connections
 from . import models
 
-
 # Create your views here.
+
+
 
 
 # 首页公司列表
 def indexCompanyList(request):
     if request.method == "GET":
         try:
-            index_company = models.companyInfo.objects.all().values("name", "id", "companyimg__name", "company_icon")[
-                            0:8]
-            res = list(index_company)
+            index_company=models.companyInfo.objects.all().values("name","id","companyimg__name","company_icon")[0:8]
+            res=list(index_company)
             if res:
-                return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
+                return JsonResponse({"status_code": "10009", "status_text":"找到数据","content": res},safe=False)
             else:
                 return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
         except Exception as ex:
             return ex
     else:
-        return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
+        return JsonResponse({"status_code":"40006","status_text":"请求方式错误"}, safe=False)
 
 
 # 公司详情
 def companyDetail(request):
     if request.method == "GET":
-        company_id = request.GET.get("company_id")
+        company_id=request.GET.get("company_id")
         if company_id:
             try:
-                company_info = models.companyInfo.objects.filter(id=company_id).values("companyimg__name", "name",
-                                                                                       "mouth_value", "bond",
-                                                                                       "contact_tel", "case_num",
-                                                                                       "work_site_num",
-                                                                                       "favorable_rate", "address")
-                res = list(company_info)
+                company_info=models.companyInfo.objects.filter(id=company_id).values("companyimg__name","name","mouth_value","bond","contact_tel","case_num","work_site_num","favorable_rate","address")
+                res=list(company_info)
                 if res:
-                    return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
+                    return JsonResponse({"status_code": "10009", "status_text":"找到数据","content": res},safe=False)
                 else:
                     return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
             except Exception as ex:
@@ -45,29 +41,30 @@ def companyDetail(request):
         else:
             return JsonResponse({"status_code": "40005", "status_text": "数据格式不合法"}, safe=False)
     else:
-        return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
+        return JsonResponse({"status_code":"40006","status_text":"请求方式错误"}, safe=False)
 
 
 # 公司列表排序
 def companySort(request):
-    if request.method == "GET":
-        detail = request.GET.get("detail")
+    if request.method=="GET":
+        detail=request.GET.get("detail")
         if detail:
-            if detail == "综合":
-                sort_condition = "id"
-            elif detail == "案例":
+            if detail=="综合":
+                sort_condition="id"
+            elif detail=="案例":
                 sort_condition = "-case_num"
-            elif detail == "工地":
+            elif detail=="工地":
                 sort_condition = "-work_site_num"
-            elif detail == "信用":
+            elif detail=="信用":
                 sort_condition = "-favorable_rate"
 
             try:
                 company_list = models.companyInfo.objects.all().values("id", "name", "contact_tel", "case_num",
-                                                                       "work_site_num", "company_icon",
-                                                                       "companyimg__name").order_by(sort_condition)
+                             "work_site_num", "company_icon", "companyimg__name").order_by(sort_condition)
                 res = list(company_list)
                 if res:
+                    for r in res:
+                        r["com_src"]=r["companyimg__name"]
                     return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
                 else:
                     return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
@@ -85,12 +82,11 @@ def dictfetchall(cursor):
         for row in cursor.fetchall()
     ]
 
-
 # 公司列表数量
 def companyNum(request):
     if request.method == "GET":
         try:
-            company = models.companyInfo.objects.all().count()
+            company=models.companyInfo.objects.all().count()
             if company:
                 return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": company}, safe=False)
             else:
@@ -99,7 +95,6 @@ def companyNum(request):
             print(ex)
     else:
         return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
-
 
 # 获取符合条件的公司数量,用于筛选分页
 def getConditionComNum(request):
@@ -118,10 +113,10 @@ def getConditionComNum(request):
                     search_style as style inner join company_companystyle as cs  \
                     on  c.price_id=price.id and style.id=cs.style_id and c.id=cs.company_id\
                     where price.`name`= '{price_name}' and style.`name`='{style_name}' and c.district='{district}' \
-                    ".format(price_name=price, style_name=style, district=address))
+                    ".format(price_name=price, style_name=style,district=address))
 
                 res = cursor.fetchone()
-                print('1' * 10)
+                print('1'*10)
                 print(res[0])
                 if res:
 
@@ -154,7 +149,7 @@ def getConditionComNum(request):
         elif price == "" and style == "" and address == "":
             try:
                 res = models.companyInfo.objects.all().count()
-                print('3' * 10)
+                print('3'*10)
                 print(res)
                 if res:
                     return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
@@ -170,9 +165,7 @@ def getConditionComNum(request):
                     search_style as style inner join company_companystyle as cs  \
                     on  c.price_id=price.id and style.id=cs.style_id and c.id=cs.company_id\
                     where (price.`name`= '{price_name}' and style.`name`='{style_name}') or (price.`name`= '{price_name}' and c.district='{district}')\
-                    or (style.`name`='{style_name}' and c.district='{district}') ORDER BY c.id".format(price_name=price,
-                                                                                                       style_name=style,
-                                                                                                       district=address))
+                    or (style.`name`='{style_name}' and c.district='{district}') ORDER BY c.id".format(price_name=price,style_name=style,district=address))
                 res = cursor.fetchone()
                 print('4' * 10)
                 print(res[0])
@@ -185,17 +178,15 @@ def getConditionComNum(request):
     else:
         return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
 
-
 # 公司第一页页面
 def companyList(request):
     if request.method == "GET":
         try:
-            company = models.companyInfo.objects.all().values("id", "company_icon", "name", "case_num", "work_site_num",
-                                                              "contact_tel", "companyimg__name")[0:5]
-            res = list(company)
+            company=models.companyInfo.objects.all().values("id","company_icon","name","case_num","work_site_num","contact_tel","companyimg__name")[0:5]
+            res=list(company)
             if res:
                 for r in res:
-                    r["com_src"] = r.pop("companyimg__name")
+                    r["com_src"]=r.pop("companyimg__name")
                 # print(res)
                 return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
             else:
@@ -206,6 +197,8 @@ def companyList(request):
         return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
 
 
+
+
 # 获取符合条件的公司
 def getConditionCompany(request):
     if request.method == "GET":
@@ -214,7 +207,7 @@ def getConditionCompany(request):
         address = request.GET.get('address')
         perPageNum = int(request.GET.get('perPageNum'))
         pageNum = request.GET.get('pageNum') and int(request.GET.get('pageNum')) * int(perPageNum)
-        pageNumber = request.GET.get('pageNum') and (int(request.GET.get('pageNum')) + 1) * int(perPageNum)
+        pageNumber = request.GET.get('pageNum') and (int(request.GET.get('pageNum'))+1) * int(perPageNum)
 
         if price and style and address:
             try:
@@ -247,9 +240,8 @@ def getConditionCompany(request):
                     search_style as style inner join company_companystyle as cs  \
                     on c.id=ci.company_id and c.price_id=price.id and style.id=cs.style_id and c.id=cs.company_id\
                     where price.`name`= '{price_name}' or style.`name`='{style_name}' or c.district='{district}' \
-                    group by c.id LIMIT {pageNum},{perPageNum}".format(price_name=price, style_name=style,
-                                                                       district=address, pageNum=pageNum,
-                                                                       perPageNum=perPageNum))
+                    group by c.id LIMIT {pageNum},{perPageNum}".format(price_name=price, style_name=style, district=address, pageNum=pageNum,
+                                          perPageNum=perPageNum))
                 res = dictfetchall(cursor)
                 if res:
                     print(res)
@@ -280,12 +272,11 @@ def getConditionCompany(request):
                     search_style as style inner join company_companystyle as cs  \
                     on c.id=ci.company_id and c.price_id=price.id and style.id=cs.style_id and c.id=cs.company_id\
                     where (price.`name`= '{price_name}' and style.`name`='{style_name}') or (price.`name`= '{price_name}' and c.district='{district}')\
-                    or (style.`name`='{style_name}' and c.district='{district}') ORDER BY c.id LIMIT {pageNum},{perPageNum}".format(
-                    price_name=price,
-                    style_name=style,
-                    district=address,
-                    pageNum=pageNum,
-                    perPageNum=perPageNum))
+                    or (style.`name`='{style_name}' and c.district='{district}') ORDER BY c.id LIMIT {pageNum},{perPageNum}".format(price_name=price,
+                                                                                                       style_name=style,
+                                                                                                       district=address,
+                                                                                                       pageNum=pageNum,
+                                                                                                       perPageNum=perPageNum))
                 res = dictfetchall(cursor)
                 if res:
                     print(res)
@@ -296,3 +287,4 @@ def getConditionCompany(request):
                 print(ex)
     else:
         return JsonResponse({"status_code": "40006", "status_text": "请求方式错误"}, safe=False)
+

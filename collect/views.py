@@ -70,7 +70,7 @@ def diaryCollections(request):
         if user_id:
             try:
                 cursor = connection.cursor()
-                sql = "SELECT c.id, d.id diary_id ,u.nickname,ui.icon , d.diary_title , s.`name` style_name ,d.company\
+                sql = "SELECT c.id collect_id, d.id diary_id ,u.nickname,ui.icon , d.diary_title , s.`name` style_name ,d.company\
                  ,c.collect_date ,dc.diary_content,(SELECT group_concat(di.diary_img) FROM diary_diaryimg di WHERE\
                   di.diaryContent_id = dc.id && dc.diary_id=d.id) diary_img FROM collect_collectinfo c INNER JOIN\
                    user_userinfo u INNER JOIN user_usericon ui INNER JOIN diary_diaryinfo d INNER JOIN \
@@ -104,7 +104,7 @@ def strategyCollections(request):
         if user_id:
             try:
                 cursor = connection.cursor()
-                sql = "select c.id, s.id , si.strategy_img,s.strategy_title, sc.lead, c.collect_date \
+                sql = "select c.id collect_id, s.id strategy_id, si.strategy_img strategy_src,s.strategy_title, sc.lead, c.collect_date \
                         from collect_collectinfo c INNER JOIN collect_collecttype ct INNER JOIN user_userinfo u \
                         INNER JOIN strategy_strategyinfo s INNER JOIN strategy_strategycontent sc INNER JOIN strategy_strategyimg si\
                         on c.collectType_id = ct.id and c.user_id =u.id and c.content_id=s.id and s.id=sc.strategy_id \
@@ -139,6 +139,7 @@ def companyCollections(request):
                         r.update(com_info[0])
                         r["check"] = False
                         r["checkNum"] = 1
+                    print(res)
                     return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
                 else:
                     return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
@@ -156,8 +157,8 @@ def caseCollections(request):
         if user_id:
             try:
                 cursor = connection.cursor()
-                sql = "select c.id, case_caseinfo.id ,ci.img_url,case_caseinfo.`name`, case_caseinfo.area, s.`name` style_name, \
-                        ht.`name` houseType, rt.`name` renovation_type, case_caseinfo.cost, c.collect_date \
+                sql = "select c.id collect_id, case_caseinfo.id case_id,ci.img_url case_src,case_caseinfo.`name` case_name, case_caseinfo.area case_area, s.`name` style_name, \
+                        ht.`name` house_type, rt.`name` renovation_type, case_caseinfo.cost price, c.collect_date \
                         from collect_collectinfo c INNER JOIN case_caseinfo INNER JOIN case_caseimg ci \
                         INNER JOIN search_style s INNER JOIN user_housetype ht INNER JOIN search_renovationtype rt\
                         on c.content_id=case_caseinfo.id and case_caseinfo.id=ci.case_id and case_caseinfo.style_id=s.id \

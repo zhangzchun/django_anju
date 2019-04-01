@@ -16,7 +16,7 @@ Including another URLconf
 from django.urls import path, re_path
 from . import views
 
-app_name = 'diary'
+app_name='diary'
 urlpatterns = [
     re_path(r'^diaryList\w*/', views.diaryList, name="diaryList"),
     re_path(r'^diaryDetailHeader\w*/', views.diaryDetailHeader, name="diaryDetailHeader"),

@@ -119,10 +119,10 @@ WSGI_APPLICATION = 'django_anju.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'renovation_django',
+        'NAME': 'django_renovation',
         'USER': 'root',
-        # 'PASSWORD': 'admin',
-        'PASSWORD':'123456',
+        'PASSWORD': 'admin',
+        # 'PASSWORD':'123456',
         # 'PASSWORD':'asd147.',
         'HOST': '127.0.0.1',
         'PORT': '3306',

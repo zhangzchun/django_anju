@@ -16,13 +16,13 @@ class RequestAuth(MiddlewareMixin):
                      '/collect/cancelCollection/',
                      '/collect/checkCollection/',
                      '/comment/addComment/',
+                     '/user/getHouseList/'
                      '/comment/addReply/',
-                     '/user/addAppointment/'
-
-                     ]
+                     '/user/addAppointment/',
+                     '/checktoken/']
 
         if url in url_check:
-            res = checkToken(request.headers.get('token'))
+            res = checkToken(request.META.get('HTTP_TOKEN'))
             if not res:
                 return JsonResponse({"status_code": "10006", "status_text": "登录过期"})
 

@@ -25,4 +25,7 @@ urlpatterns = [
 
     url(r'designerListNum/',views.designerListNum,name='designerListNum'),
     url(r'designerPage/',views.designerPage,name='designerPage'),
+    url(r'designerDetailListNum/',views.designerDetailListNum,name='designerDetailListNum'),
+    url(r'designerDetailList/',views.designerDetailList,name='designerDetailList'),
+    url(r'getDesignerInfo/',views.getDesignerInfo,name='getDesignerInfo'),
 ]

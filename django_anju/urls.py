@@ -21,6 +21,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('qiniuToken/',views.qiniuToken,name='qiniuToken'),
     path('sendMessage/',views.sendMessage,name='sendMessage'),
+    path('checktoken/',views.checktoken,name='checktoken'),
     path('case/', include('case.urls')),
     path('collect/', include('collect.urls')),
     path('comment/', include('comment.urls')),

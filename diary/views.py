@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from . import models
+import json
 from user import models as umodels
 from django.http import HttpResponse, response, JsonResponse
 from django.db import connection, connections
@@ -79,6 +80,7 @@ def diaryDetailContent(request):
                     res02 = list(diary_img)
                     r["diary_imgs"] = res02
                 if res01:
+                    print(res01)
                     return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res01}, safe=False)
                 else:
                     return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
@@ -94,14 +96,12 @@ def diaryDetailContent(request):
 def diaryUserIcon(request):
     if request.method == "GET":
         try:
-            dairy_content = models.diaryInfo.objects.all().values("id", "user_id").order_by("id")[0:12]
+            dairy_content = models.diaryInfo.objects.all().values("id","user_id").order_by("id")[0:12]
             res = list(dairy_content)
             if res:
                 for r in res:
-                    user_icon = list(
-                        umodels.userIcon.objects.filter(user_id=r["user_id"]).values("icon").order_by("-upload_date")[
-                        0:1])
-                    r["user_icon"] = user_icon[0]["icon"]
+                    user_icon=list(umodels.userIcon.objects.filter(user_id=r["user_id"]).values("icon").order_by("-upload_date")[0:1])
+                    r["user_icon"]=user_icon[0]["icon"]
                 return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
             else:
                 return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
