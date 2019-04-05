@@ -33,8 +33,11 @@ def cancelCollection(request):
     if request.method == "POST":
         collect_id = json.loads(request.body)
         if collect_id:
-            affect_rows = models.collectInfo.objects.filter(id=collect_id['collect_id']).delete()
-            if affect_rows:
+            num=0
+            for c_id in collect_id['collect_id']:
+                affect_rows = models.collectInfo.objects.filter(id=c_id).delete()
+                num=num+1
+            if num==len(collect_id["collect_id"]):
                 return JsonResponse({"status_code": "10040", "status_text": "取消收藏成功"}, safe=False)
             else:
                 return JsonResponse({"status_code": "10041", "status_text": "取消收藏失败"}, safe=False)

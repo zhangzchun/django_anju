@@ -13,12 +13,13 @@ def diaryList(request):
     if request.method == "GET":
         try:
             cursor = connection.cursor()
-            sql = "SELECT d.id diary_id ,u.nickname , ui.icon , d.diary_title , s.`name` style_name ,d.company , d.publish_date,\
+            sql = "SELECT d.id diary_id ,u.nickname ,d.diary_title , s.`name` style_name ,d.company , d.publish_date,\
+                    (SELECT ui.icon from user_usericon ui where ui.user_id=u.id ORDER BY ui.upload_date desc limit 1) icon, \
                     dc.diary_content,(SELECT group_concat(di.diary_img) FROM diary_diaryimg di  \
                     WHERE di.diaryContent_id = dc.id && dc.diary_id=d.id) diary_img \
-                    FROM user_userinfo u INNER JOIN user_usericon ui INNER JOIN diary_diaryinfo d INNER JOIN search_style s \
+                    FROM user_userinfo u INNER JOIN diary_diaryinfo d INNER JOIN search_style s \
                     INNER JOIN search_renovationtype rt INNER JOIN diary_diarycontent dc \
-                    on u.id=ui.user_id  && d.user_id=u.id && d.style_id=s.id && d.renovationType_id=rt.id && d.id=dc.diary_id \
+                    on d.user_id=u.id && d.style_id=s.id && d.renovationType_id=rt.id && d.id=dc.diary_id \
                     where dc.stage='前期准备' order by d.publish_date desc"
 
             cursor.execute(sql)
@@ -43,10 +44,11 @@ def diaryDetailHeader(request):
         if diary_id:
             try:
                 cursor = connection.cursor()
-                sql = "SELECT d.id,u.nickname , ui.icon user_icon , d.diary_title ,d.publish_date,d.area, s.`name` style , \
-                        rt.`name` type,d.village location ,d.company,d.browse_num,d.collect_num,d.comment_num\
-                        FROM user_userinfo u INNER JOIN user_usericon ui INNER JOIN diary_diaryinfo d INNER JOIN search_style s INNER JOIN \
-                        search_renovationtype rt on u.id=ui.user_id  && d.user_id=u.id && d.style_id=s.id && d.renovationType_id=rt.id\
+                sql = "SELECT d.id,u.nickname  , d.diary_title ,d.publish_date,d.area, s.`name` style , rt.`name` type, \
+                      (SELECT ui.icon from user_usericon ui where ui.user_id=u.id ORDER BY ui.upload_date desc limit 1) icon,\
+                        d.village location ,d.company,d.browse_num,d.collect_num,d.comment_num\
+                        FROM user_userinfo u INNER JOIN diary_diaryinfo d INNER JOIN search_style s INNER JOIN \
+                        search_renovationtype rt on d.user_id=u.id && d.style_id=s.id && d.renovationType_id=rt.id\
                         where d.id={id}".format(id=diary_id)
 
                 cursor.execute(sql)
@@ -80,7 +82,6 @@ def diaryDetailContent(request):
                     res02 = list(diary_img)
                     r["diary_imgs"] = res02
                 if res01:
-                    print(res01)
                     return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res01}, safe=False)
                 else:
                     return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
@@ -96,12 +97,14 @@ def diaryDetailContent(request):
 def diaryUserIcon(request):
     if request.method == "GET":
         try:
-            dairy_content = models.diaryInfo.objects.all().values("id","user_id").order_by("id")[0:12]
+            dairy_content = models.diaryInfo.objects.all().values("id", "user_id").order_by("id")[0:12]
             res = list(dairy_content)
             if res:
                 for r in res:
-                    user_icon=list(umodels.userIcon.objects.filter(user_id=r["user_id"]).values("icon").order_by("-upload_date")[0:1])
-                    r["user_icon"]=user_icon[0]["icon"]
+                    user_icon = list(
+                        umodels.userIcon.objects.filter(user_id=r["user_id"]).values("icon").order_by("-upload_date")[
+                        0:1])
+                    r["user_icon"] = user_icon[0]["icon"]
                 return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": res}, safe=False)
             else:
                 return JsonResponse({"status_code": "10008", "status_text": "未找到数据"}, safe=False)
@@ -118,7 +121,8 @@ def indexDiary(request):
         if diary_id:
             try:
                 cursor = connection.cursor()
-                sql = "SELECT d.id diary_id , ui.icon , d.diary_title , s.`name` style_name ,d.company,\
+                sql = "SELECT d.id diary_id ,  d.diary_title , s.`name` style_name ,d.company,\
+                      (SELECT ui.icon from user_usericon ui where ui.user_id=u.id ORDER BY ui.upload_date desc limit 1) icon,\
                         dc.diary_content,(SELECT group_concat(di.diary_img) FROM diary_diaryimg di  \
                         WHERE di.diaryContent_id = dc.id && dc.diary_id=d.id) diary_img \
                         FROM user_userinfo u INNER JOIN user_usericon ui INNER JOIN diary_diaryinfo d INNER JOIN search_style s \
@@ -213,7 +217,7 @@ def addDiary(request):
                 diary_id = res.id
                 if diary_id:
                     return JsonResponse({"status_code": "10012", "status_text": "添加信息成功", "content": diary_id},
-                                      safe=False)
+                                        safe=False)
                 else:
                     return JsonResponse({"status_code": "10013", "status_text": "添加信息失败"}, safe=False)
 
@@ -244,10 +248,6 @@ def updaeDiary(request):
 # 写日记内容
 def writeDiary(request):
     pass
-
-
-
-
 
 
 # 返回字典对象

@@ -44,6 +44,20 @@ def regist(request):
                     res_user = models.userInfo.objects.create(**user)
                     # 用户id
                     user_id = res_user.id
+                    # 插入默认头像
+                    user_icons=[
+                        "http://porcbrvf3.bkt.clouddn.com/110048c5-c7a8-4c06-8976-8b38027ca45c.jpg?imageView2/1/w/200/h/200/q/100",
+                        "http://porcbrvf3.bkt.clouddn.com/10e0abdd-61fa-4d35-8d12-933b9ca00804.jpg?imageView2/1/w/200/h/200/q/100",
+                        "http://porcbrvf3.bkt.clouddn.com/13a6f4f1-3213-477e-90ab-21e773c4eb27.jpg?imageView2/1/w/200/h/200/q/100",
+                        "http://porcbrvf3.bkt.clouddn.com/42ecb69f-7aed-47fa-b07a-f41c1b70f0dd.jpg?imageView2/1/w/200/h/200/q/100",
+                        "http://porcbrvf3.bkt.clouddn.com/bc517447-e465-418a-90c4-db01f5cd4050.jpg?imageView2/1/w/200/h/200/q/100",
+                        "http://porcbrvf3.bkt.clouddn.com/e3843ed3-df1c-4357-8f86-675a61f4aeb2.jpg?imageView2/1/w/200/h/200/q/100",
+                        "http://porcbrvf3.bkt.clouddn.com/e38cea95-cbd4-4383-a0d9-3fe02210c97c.jpg?imageView2/1/w/200/h/200/q/100",
+                        "http://porcbrvf3.bkt.clouddn.com/f037c7ac-650c-4cec-a461-93c3d9dce3f7.jpg?imageView2/1/w/200/h/200/q/100",
+                    ]
+
+                    user_icon=models.userIcon.objects.create(icon=random.choice(user_icons),user_id=user_id)
+                    user_icon.save()
                     nickname = res_user.nickname
 
                     # 构建token
@@ -347,8 +361,7 @@ def getHouseList(request):
                                                                             )
                 houseinfo = list(res)
                 if houseinfo:
-                    for h in houseinfo:
-                        h["flag"]=False
+
                     return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": houseinfo},
                                         safe=False)
                 else:
@@ -372,6 +385,8 @@ def getHouseList(request):
 
                 houselist = list(res)
                 if houselist:
+                    for h in houselist:
+                        h["flag"]=False
                     return JsonResponse({"status_code": "10009", "status_text": "找到数据", "content": houselist},
                                         safe=False)
                 else:
@@ -400,7 +415,7 @@ def updateHouseInfo(request):
             # body = request.body
             # user = body and json.loads(body)
             houseInfo=json.loads(request.body)
-            print(houseInfo)
+
             if houseInfo:
                 del houseInfo["flag"]
                 houseType=list(models.houseType.objects.filter(name=houseInfo["type"]).values("id"))
@@ -430,13 +445,12 @@ def addHouseInfo(request):
     # # 请求方式为--POST
         try:
             houseInfo=json.loads(request.body)
-            print(houseInfo)
             if houseInfo:
                 del houseInfo["flag"]
                 houseType=list(models.houseType.objects.filter(name=houseInfo["type"]).values("id"))
                 del houseInfo["type"]
                 houseInfo["houseType_id"]=houseType[0]["id"]
-                print(houseInfo)
+
                 house=models.houseInfo.objects.create(**houseInfo)
                 house.save()
                 if house.id:
@@ -460,7 +474,7 @@ def delHouseInfo(request):
             if house_id["id"]:
 
                 row=models.houseInfo.objects.filter(id=house_id["id"]).delete()
-                print(row)
+
                 if row:
                     return JsonResponse({"status_code": "10016", "status_text": "删除信息成功"}, safe=False)
                 else:
